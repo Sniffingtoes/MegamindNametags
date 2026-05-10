@@ -21,11 +21,6 @@ namespace MegamindPlugin
             new Harmony(PluginInfo.GUID).PatchAll(Assembly.GetExecutingAssembly());
         }
 
-        void Start()
-        {
-           
-        }
-
         void LateUpdate()
         {
             if (Time.frameCount % 30 == 0)
@@ -33,23 +28,32 @@ namespace MegamindPlugin
                 if (motdFont == null)
                 {
                     GameObject motd = GameObject.Find("Environment Objects/LocalObjects_Prefab/TreeRoom/motdBodyText");
-                    if (motd != null) motdFont = motd.GetComponent<TextMeshPro>().font;
+                    if (motd != null)
+                    {
+                        TextMeshPro tmp = motd.GetComponent<TextMeshPro>();
+                        if (tmp != null) motdFont = tmp.font;
+                    }
                 }
 
                 foreach (VRRig rig in GameObject.FindObjectsOfType<VRRig>())
                 {
                     if (rig == null || rig.isOfflineVRRig || rig.isMyPlayer) continue;
                     if (string.IsNullOrEmpty(rig.playerNameVisible) || rig.playerNameVisible == "Gorilla") continue;
+
+                    if (rig.head == null || rig.head.rigTarget == null) continue;
+
                     UpdateNametag(rig);
                 }
             }
         }
+
         public void UpdateNametag(VRRig rig)
         {
+            if (rig == null || rig.head == null || rig.head.rigTarget == null) return;
+
             Transform head = rig.head.rigTarget.transform;
             Transform tagTransform = head.Find("Megamind_Nametag");
             TextMeshPro text;
-            SpriteRenderer sr;
 
             if (tagTransform == null)
             {
@@ -57,7 +61,6 @@ namespace MegamindPlugin
                 root.transform.SetParent(head, false);
                 root.transform.localPosition = new Vector3(0f, 0.45f, 0f);
                 root.AddComponent<CameraFollower>();
-
                 text = root.AddComponent<TextMeshPro>();
                 text.fontSize = 1.4f;
                 text.alignment = TextAlignmentOptions.Center;
@@ -67,15 +70,16 @@ namespace MegamindPlugin
             else
             {
                 text = tagTransform.GetComponent<TextMeshPro>();
-                sr = tagTransform.Find("Megamind_Icon").GetComponent<SpriteRenderer>();
+                if (text == null) return;
             }
 
             text.text = rig.playerNameVisible;
+
             if (rig.colorInitialized)
             {
                 text.color = rig.playerColor;
             }
-            else if (rig.mainSkin?.material != null)
+            else if (rig.mainSkin != null && rig.mainSkin.material != null)
             {
                 text.color = rig.mainSkin.material.color;
             }

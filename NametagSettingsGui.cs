@@ -321,6 +321,7 @@ namespace MegamindPlugin
         {
             ToggleRow("Nametags enabled", P.NametagsEnabled);
             ToggleRow("FPS above heads", P.ShowFpsAboveHead);
+            ToggleRow("Platform detection", P.ShowPlatformIcons);
         }
 
         void DrawSettingsTab()
@@ -344,6 +345,13 @@ namespace MegamindPlugin
             if (GUILayout.Button("FPS", _segmentStyle, GUILayout.Height(42)))
                 _settingsSub = 1;
 
+            GUI.backgroundColor = _settingsSub == 2
+                ? new Color(0.2f, 0.2f, 0.22f)
+                : new Color(0.08f, 0.08f, 0.09f);
+
+            if (GUILayout.Button("Platform", _segmentStyle, GUILayout.Height(42)))
+                _settingsSub = 2;
+
             GUI.backgroundColor = Color.white;
 
             GUILayout.EndHorizontal();
@@ -363,7 +371,7 @@ namespace MegamindPlugin
 
                 SliderRow("Font Size", P.FontSize, 0.35f, 5f);
             }
-            else
+            else if (_settingsSub == 1)
             {
                 GUILayout.Label("FPS label Settings", _rowStyle);
                 GUILayout.Space(4f);
@@ -385,6 +393,10 @@ namespace MegamindPlugin
                 SliderRow("B", P.FpsColorB, 0f, 1f);
                 SliderRow("A", P.FpsColorA, 0.2f, 1f);
             }
+            else
+            {
+                DrawPlatformSettings();
+            }
         }
 
         void DrawColorsTab()
@@ -395,6 +407,42 @@ namespace MegamindPlugin
             SliderRow("Custom G", P.CustomColorG, 0f, 1f);
             SliderRow("Custom B", P.CustomColorB, 0f, 1f);
             SliderRow("Custom A", P.CustomColorA, 0.2f, 1f);
+        }
+
+        void DrawPlatformSettings()
+        {
+            ToggleRow("Platform detection", P.ShowPlatformIcons);
+            GUILayout.Space(10f);
+
+            GUILayout.Label("Icon Position", _rowStyle);
+            SegmentedIntRow(P.PlatformIconLocation, new[] { "Top", "Left", "Right" });
+
+            GUILayout.Space(14f);
+            SliderRow("Icon Size", P.PlatformIconSize, 0.02f, 0.8f);
+            SliderRow("Icon Spacing", P.PlatformIconSpacing, 0f, 1f);
+        }
+
+        void SegmentedIntRow(ConfigEntry<int> entry, string[] labels)
+        {
+            if (entry == null || labels == null || labels.Length == 0) return;
+
+            GUILayout.BeginHorizontal();
+            for (int i = 0; i < labels.Length; i++)
+            {
+                GUI.backgroundColor = entry.Value == i
+                    ? new Color(0.2f, 0.2f, 0.22f)
+                    : new Color(0.08f, 0.08f, 0.09f);
+
+                if (GUILayout.Button(labels[i], _segmentStyle, GUILayout.Height(42)))
+                    entry.Value = i;
+            }
+            GUI.backgroundColor = Color.white;
+
+            if (GUILayout.Button("Reset", _tinyBtnStyle, GUILayout.Width(60f), GUILayout.Height(34f)))
+                P.ResetEntry(entry);
+
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10f);
         }
 
         void ToggleRow(string label, ConfigEntry<bool> entry)

@@ -3,7 +3,7 @@ cool nametags for gorilla tag
 
 
 # Nametags
-<img width="647" height="544" alt="image" src="https://github.com/user-attachments/assets/7ca9c083-83f3-4e48-ac99-5782f0f30b7c" />
+<img width="587" height="462" alt="image" src="https://github.com/user-attachments/assets/c0634a8c-a0c8-4508-8e15-862b1cb51b4f" />
 
 
 # GUI
